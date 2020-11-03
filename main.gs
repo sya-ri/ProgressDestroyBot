@@ -135,13 +135,15 @@ function isTargetDate(targetDate) {
 
 function deleteDestoryHistory() {
   var imIdList = slackApp.imList()["ims"].map((user) => user["id"]);
-  var deleteCount = 0;
   imIdList.forEach(function(imId){
     var imHistory = slackApp.imHistory(imId, {count: 1000});
+    var deleteCount = 0;
     imHistory["messages"].map((message) => message["ts"]).forEach(function(ts){
       slackApp.chatDelete(imId, ts);
       deleteCount ++;
     });
+    if(deleteCount != 0){
+      Logger.log(imId + " 削除: " + deleteCount);
+    }
   });
-  Logger.log("削除: " + deleteCount);
 }

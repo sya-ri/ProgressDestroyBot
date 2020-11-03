@@ -47,6 +47,7 @@ function postDay(){
   var today = Moment.moment().format("MM/DD");
   if(!isTargetDate(today)) return;
   slackApp.postMessage(progressReportChannel, today);
+  deleteDestoryHistory();
 }
 
 function postDestroy(){
@@ -132,3 +133,15 @@ function isTargetDate(targetDate) {
   return false;
 }
 
+function deleteDestoryHistory() {
+  var imIdList = slackApp.imList()["ims"].map((user) => user["id"]);
+  var deleteCount = 0;
+  imIdList.forEach(function(imId){
+    var imHistory = slackApp.imHistory(imId, {count: 1000});
+    imHistory["messages"].map((message) => message["ts"]).forEach(function(ts){
+      slackApp.chatDelete(imId, ts);
+      deleteCount ++;
+    });
+  });
+  Logger.log("削除: " + deleteCount);
+}

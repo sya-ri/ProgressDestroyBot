@@ -134,16 +134,22 @@ function isTargetDate(targetDate) {
 }
 
 function deleteDestoryHistory() {
-  var imIdList = slackApp.imList().ims.map((user) => user.id);
-  imIdList.forEach(function(imId){
-    var imHistory = slackApp.imHistory(imId, {count: 1000});
-    var deleteCount = 0;
-    imHistory.messages.map((message) => message.ts).forEach(function(ts){
-      slackApp.chatDelete(imId, ts);
-      deleteCount ++;
+  var imList = slackApp.imList().ims;
+  imList.forEach(function(im){
+    var imHistory = slackApp.imHistory(im.id, {count: 1000});
+    var deleteSuccessCount = 0;
+    var deleteFailureCount = 0;
+    imHistory.messages.forEach(function(message){
+      if(message.user != im.user && !message.hidden){
+        if(slackApp.chatDelete(im.id, message.ts).ok){
+          deleteSuccessCount ++;
+        } else {
+          deleteFailureCount ++;
+        }
+      }
     });
-    if(deleteCount != 0){
-      Logger.log(imId + " 削除: " + deleteCount);
+    if(deleteSuccessCount != 0 || deleteFailureCount != 0){
+      Logger.log(im.user + " 削除: " + deleteSuccessCount + " | " + deleteFailureCount);
     }
   });
 }

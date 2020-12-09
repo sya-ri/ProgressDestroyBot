@@ -116,6 +116,55 @@ function slackChatDelete(channel, ts) {
 }
 /*** Slack API ***/
 
+/*** User Option ***/
+// --- option: JSON
+// {
+//   "users": {
+//     "$slack_user_name": "$display_name
+//   }
+// }
+function saveOption(json) {
+  PropertiesService.getScriptProperties().setProperty("option", JSON.stringify(json));
+}
+
+function getOption() {
+  const rawJson = PropertiesService.getScriptProperties().getProperty("option");
+  var json = (rawJson == null)? {} : JSON.parse(rawJson);
+  if(!json.users) json.users = {};
+  return json;
+}
+
+function editOption(action) {
+  const json = getOption();
+  action(json);
+  saveOption(json);
+}
+
+function addUser(id, name) {
+  editOption((json) => {
+    json.users[id] = name;
+  });
+}
+
+function removeUser(id) {
+  editOption((json) => {
+    delete json.users[id];
+  });
+}
+
+function getUser(id) {
+  const json = getOption();
+  if(json.users) return json.users[id];
+  return null;
+}
+
+function getUsers() {
+  const json = getOption();
+  if(json.users) return json.users;
+  return {};
+}
+/*** User Option ***/
+
 function doPost(e) {
   switch(e.parameter["path"]) {
     case "cmd":
@@ -126,7 +175,7 @@ function doPost(e) {
 }
 
 function doPostCmd(e) {
-  return ContentService.createTextOutput().setContent(JSON.stringify(e));
+  return ContentService.createTextOutput().setContent(JSON.stringify(e))
 }
 
 function doPostEvent(e) {

@@ -29,13 +29,9 @@
 3. `Features` から `OAuth & Permissions` を選択
 4. `Bot Token Scopes` に以下を追加
 > - channels:history
-> - channels:read
+> - channels:join
 > - chat:write
-> - files:read
-> - im:history
-> - im:read
-> - im:write
-> - users:read
+> - commands
 5. ワークスペースにインストールする
 6. `Bot User OAuth Access Token` を `SlackApiToken` としてプロパティに追加
 

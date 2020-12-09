@@ -117,6 +117,19 @@ function slackChatDelete(channel, ts) {
 /*** Slack API ***/
 
 function doPost(e) {
+  switch(e.parameter["path"]) {
+    case "cmd":
+      return doPostCmd(e);
+    case "event":
+      return doPostEvent(e);
+  }
+}
+
+function doPostCmd(e) {
+  return ContentService.createTextOutput().setContent(JSON.stringify(e));
+}
+
+function doPostEvent(e) {
   const postData = JSON.parse(e.postData.getDataAsString());
   if(postData.type == "url_verification") {
     return ContentService.createTextOutput(postData.challenge);
@@ -141,8 +154,9 @@ function doPost(e) {
         }
       }
     }
-  }
+  } 
 }
+      
 
 function postDay(){
   const today = Moment.moment().format("MM/DD");

@@ -60,7 +60,7 @@
 1. `公開 > ウェブアプリケーションとして導入` を選択
 2. `Project version` を `New` に変更
 3. `Who has access to the app` を `Anyone, even anonymous` に変更
-4. `Deploy` で公開し、URLをコピー
+4. `Deploy` で公開し、URLをコピー(`7.1` で後からでもURLをコピーできる)
 
 ### 8. イベントを受け付ける
 1. `Features` から `Event Subscriptions` を選択
@@ -68,3 +68,9 @@
 3. `7.4` でコピーしたURLの末尾に `?path=event` を付加して、`Request URL` に貼り付ける
 4. `Subscribe to bot events` を選択
 5. `message.channels` を追加し、保存
+
+### 9. コマンドを追加する
+1. `Features` から `Slash Commands` を選択
+2. `Create New Command` を選択
+3. `7.4` でコピーしたURLの末尾に `path=cmd` を付加して、`Request URL` に貼り付ける
+4. `Short Description` を `進捗破壊ボット` に変更し、保存

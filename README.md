@@ -26,14 +26,14 @@
 2. AppName を入力。  Development Slack Workspace で運用するワークスペースを選択
 3. `Features` から `App Home` を選択
 4. `App Display Name > Edit` を選択し、 `Display Name`, `Default Name` を設定
-3. `Features` から `OAuth & Permissions` を選択
-4. `Bot Token Scopes` に以下を追加
+5. `Features` から `OAuth & Permissions` を選択
+6. `Bot Token Scopes` に以下を追加
 > - channels:history
 > - channels:join
 > - chat:write
 > - commands
-5. ワークスペースにインストールする
-6. `Bot User OAuth Access Token` を `SlackApiToken` としてプロパティに追加
+7. ワークスペースにインストールする
+8. `Bot User OAuth Access Token` を `SlackApiToken` としてプロパティに追加
 
 ### 4. 進捗報告するチャンネルを設定する
 1. スラックでチャンネルを作成する

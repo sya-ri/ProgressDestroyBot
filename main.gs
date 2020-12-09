@@ -25,6 +25,15 @@ function test(){
   } else {
     throw new Error("メッセージ送信に失敗しました " + JSON.stringify(response));
   }
+  
+  // メッセージ削除
+  Utilities.sleep(5000); // 送信から５秒後に削除
+  response = slackChatDelete(properties.ProgressReportChannel, response.message.ts);
+  if(response.ok){
+    Logger.log("メッセージ削除に成功しました");
+  } else {
+    throw new Error("メッセージ削除に失敗しました " + JSON.stringify(response));
+  }
   Logger.log("全てのテスト処理に成功");
 }
 
@@ -74,6 +83,14 @@ function slackChatPostMessage(channel, text) {
   return slackFetch("chat.postMessage", {
     "channel": channel,
     "text": text
+  });
+}
+
+// https://api.slack.com/methods/chat.delete
+function slackChatDelete(channel, ts) {
+  return slackFetch("chat.delete", {
+    "channel": channel,
+    "ts": ts
   });
 }
 /*** Slack API ***/
@@ -204,7 +221,7 @@ function deleteDestoryHistory() {
     var deleteFailureCount = 0;
     imHistory.messages.forEach(function(message){
       if(message.user != im.user && !message.hidden){
-        if(slackApp.chatDelete(im.id, message.ts).ok){
+        if(slackChatDelete(im.id, message.ts).ok){
           deleteSuccessCount ++;
         } else {
           deleteFailureCount ++;

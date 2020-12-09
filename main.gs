@@ -9,7 +9,7 @@ const ProgressReportChannel = properties.ProgressReportChannel;
 
 const spreadSheet = SpreadsheetApp.openById(ProgressReportSheet);
 
-function test(){
+function runTest(){
   var response;
   // 接続テスト
   response = slackAuthTest();

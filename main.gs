@@ -1,5 +1,4 @@
 var properties = PropertiesService.getScriptProperties().getProperties();
-var slackApp = SlackApp.create(properties.SlackApiToken);
 var spreadSheet = SpreadsheetApp.openById(properties.ProgressReportSheet);
 
 function test(){
@@ -140,7 +139,7 @@ function doPost(e) {
 function postDay(){
   var today = Moment.moment().format("MM/DD");
   if(!isTargetDate(today)) return;
-  slackApp.postMessage(progressReportChannel, today);
+  slackPostMessage(progressReportChannel, today);
   deleteDestoryHistory();
 }
 
@@ -161,17 +160,17 @@ function postDestroy(){
 function editProgress(channel, user, ts, messageTs, content, editIfEmpty){
   var sheetName = getSheetName(user);
   if(sheetName == null){
-    //slackApp.postMessage(channel, "シートが登録されてないです。開発者のお兄ちゃんに言ってね");
+    //slackPostMessage(channel, "シートが登録されてないです。開発者のお兄ちゃんに言ってね");
     return;
   }
   var targetDate = Moment.moment(ts * 1000).subtract(9, 'h').format("MM/DD");
   var isSuccess = setProgress(sheetName, targetDate, content, editIfEmpty);
   if(isSuccess == null){
-    //slackApp.postMessage(channel, "なんかバグりました。開発者のお兄ちゃんに言ってね");
+    //slackPostMessage(channel, "なんかバグりました。開発者のお兄ちゃんに言ってね");
     return;
   }
   if(!isSuccess){
-    slackApp.chatDelete(channel, messageTs);
+    slackChatDelete(channel, messageTs);
   }
 }
 
@@ -228,9 +227,12 @@ function isTargetDate(targetDate) {
 }
 
 function deleteDestoryHistory() {
-  var imList = slackApp.imList().ims;
-  imList.forEach(function(im){
-    var imHistory = slackApp.imHistory(im.id, {count: 1000});
+  for(var i = 0; i < allLine.length; i++){
+    var userSheet = spreadSheet.getSheetByName(allLine[i][1]);
+    var value = userSheet.getRange("B" + line).getValue();
+    if(value != null && value != "") continue;
+    var im = allLine[i][0];
+    var imHistory = slackChannelsHistory(im.id, {count: 1000});
     var deleteSuccessCount = 0;
     var deleteFailureCount = 0;
     imHistory.messages.forEach(function(message){
@@ -245,5 +247,5 @@ function deleteDestoryHistory() {
     if(deleteSuccessCount != 0 || deleteFailureCount != 0){
       Logger.log(im.user + " 削除: " + deleteSuccessCount + " | " + deleteFailureCount);
     }
-  });
+  }
 }

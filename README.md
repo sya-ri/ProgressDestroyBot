@@ -50,12 +50,7 @@
 2. 開いたURL `https://docs.google.com/spreadsheets/d/XXXXXXXXXX/` の `XXXXXXXXXX` の部分を切り取る
 3. 切り取ったIDを `ProgressReportSheet` としてプロパティに追加
 
-### 6. GAS で SlackApp を使えるようにする
-1. GAS のプロジェクトを開き `リソース > ライブラリ` を選択
-2. `M3W5Ut3Q39AaIwLquryEPMwV62A3znfOO` を `Add a library` にコピペし、`追加` を押す
-3. `バージョン` は最新版(22)を選択し、保存
-
-### 7. 実際に動かしてみる
+### 6. 実際に動かしてみる
 1. main.gs の内容を GAS プロジェクト の main.gs にコピペする
 2. `関数を選択` をクリックし `checkConnect` を選択
 3. 実行の許可が必要なので、許可する。

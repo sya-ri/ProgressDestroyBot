@@ -18,6 +18,13 @@ function test(){
   } else {
     throw new Error("チャンネル参加に失敗しました " + JSON.stringify(response));
   }
+  // メッセージ送信
+  response = slackChatPostMessage(properties.ProgressReportChannel, "テストメッセージ");
+  if(response.ok){
+    Logger.log("メッセージ送信に成功しました");
+  } else {
+    throw new Error("メッセージ送信に失敗しました " + JSON.stringify(response));
+  }
   Logger.log("全てのテスト処理に成功");
 }
 
@@ -59,6 +66,14 @@ function slackAuthTest() {
 function slackChannelsJoin(channel) {
   return slackFetch("conversations.join", {
     "channel": channel
+  });
+}
+
+// https://api.slack.com/methods/chat.postMessage
+function slackChatPostMessage(channel, text) {
+  return slackFetch("chat.postMessage", {
+    "channel": channel,
+    "text": text
   });
 }
 /*** Slack API ***/
@@ -108,7 +123,7 @@ function postDestroy(){
     var userSheet = spreadSheet.getSheetByName(allLine[i][1]);
     var value = userSheet.getRange("B" + line).getValue();
     if(value != null && value != "") continue;
-    slackApp.postMessage(allLine[i][0], "お前、破壊されたいのか？？？");
+    slackChatPostMessage(allLine[i][0], "お前、破壊されたいのか？？？");
   }
 }
 

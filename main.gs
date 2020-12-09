@@ -4,12 +4,13 @@ var spreadSheet = SpreadsheetApp.openById(properties.ProgressReportSheet);
 var progressReportChannel = properties.ProgressReportChannel;
 
 function checkConnect(){
-  Logger.log(slackAuthTest());
-  Logger.log(slackApp.authTest());
-  /*if(!slackAuthTest.ok){
-    Logger.log("ボットの接続に失敗しました");
-    return;
+  // 接続テスト https://api.slack.com/methods/auth.test
+  if(slackAuthTest().ok){
+    Logger.log("SlackAPIに接続しました")
+  } else {
+    throw new Error("SlackAPIの接続に失敗しました");
   }
+  /*
   if(!slackApp.channelsInfo(progressReportChannel).ok){
     Logger.log("進捗報告チャンネルが見つかりませんでした");
     return;

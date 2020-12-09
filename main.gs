@@ -1,5 +1,13 @@
-var properties = PropertiesService.getScriptProperties().getProperties();
-var spreadSheet = SpreadsheetApp.openById(properties.ProgressReportSheet);
+/* プロジェクトプロパティ */
+const properties = PropertiesService.getScriptProperties().getProperties();
+const SlackApiToken = properties.SlackApiToken;
+const ProgressReportSheet = properties.ProgressReportSheet;
+const UserIdTableSheet = properties.UserIdTableSheet;
+const TargetDateTableSheet = properties.TargetDateTableSheet;
+const ProgressReportChannel = properties.ProgressReportChannel;
+/* プロジェクトプロパティ */
+
+var spreadSheet = SpreadsheetApp.openById(ProgressReportSheet);
 
 function test(){
   var response;
@@ -11,14 +19,14 @@ function test(){
     throw new Error("SlackAPIの接続に失敗しました " + JSON.stringify(response));
   }
   // チャンネル参加
-  response = slackChannelsJoin(properties.ProgressReportChannel);
+  response = slackChannelsJoin(ProgressReportChannel);
   if(response.ok){
     Logger.log("チャンネルに参加しました");
   } else {
     throw new Error("チャンネル参加に失敗しました " + JSON.stringify(response));
   }
   // メッセージ送信
-  response = slackChatPostMessage(properties.ProgressReportChannel, "テストメッセージ");
+  response = slackChatPostMessage(ProgressReportChannel, "テストメッセージ");
   if(response.ok){
     Logger.log("メッセージ送信に成功しました");
   } else {
@@ -26,14 +34,14 @@ function test(){
   }
   // メッセージ削除
   Utilities.sleep(5000); // 送信から５秒後に削除
-  response = slackChatDelete(properties.ProgressReportChannel, response.message.ts);
+  response = slackChatDelete(ProgressReportChannel, response.message.ts);
   if(response.ok){
     Logger.log("メッセージ削除に成功しました");
   } else {
     throw new Error("メッセージ削除に失敗しました " + JSON.stringify(response));
   }
   // メッセージ履歴取得
-  response = slackChannelsHistory(properties.ProgressReportChannel, 1);
+  response = slackChannelsHistory(ProgressReportChannel, 1);
   if(response.ok){
     Logger.log("メッセージ履歴取得に成功しました");
   } else {
@@ -60,7 +68,7 @@ var _uox = function(f, retry) {
 function slackFetch(path, param, option) {
   if (param == null) param = {};
   if (option == null) option = {};
-  param.token = properties.SlackApiToken;
+  param.token = SlackApiToken;
   var opt = {
     method: "POST",
     payload: param
@@ -146,7 +154,7 @@ function postDay(){
 function postDestroy(){
   var today = Moment.moment().format("MM/DD");
   if(!isTargetDate(today)) return;
-  var sheet = spreadSheet.getSheetByName(properties.UserIdTableSheet);
+  var sheet = spreadSheet.getSheetByName(UserIdTableSheet);
   var allLine = sheet.getRange("A2:B").getValues();
   var line = getSheetLineOfDate(today);
   for(var i = 0; i < allLine.length; i++){
@@ -175,7 +183,7 @@ function editProgress(channel, user, ts, messageTs, content, editIfEmpty){
 }
 
 function getSheetName(user){
-  var sheet = spreadSheet.getSheetByName(properties.UserIdTableSheet);
+  var sheet = spreadSheet.getSheetByName(UserIdTableSheet);
   var allLine = sheet.getRange("A2:B").getValues();
   for(var i = 0; i < allLine.length; i++){
     if(user == allLine[i][0]){
@@ -201,7 +209,7 @@ var sheetLineOfDate = null;
 
 function getSheetLineOfDate(targetDate){
   if(sheetLineCacheDate == targetDate && sheetLineOfDate != null) return sheetLineOfDate;
-  var sheet = spreadSheet.getSheetByName(properties.TargetDateTableSheet);
+  var sheet = spreadSheet.getSheetByName(TargetDateTableSheet);
   var allLine = sheet.getRange("A2:A").getValues();
   for(var i = 0; i < allLine.length - 1; i++){
     var date = Moment.moment(allLine[i][0]).format("MM/DD");
@@ -215,7 +223,7 @@ function getSheetLineOfDate(targetDate){
 }
 
 function isTargetDate(targetDate) {
-  var sheet = spreadSheet.getSheetByName(properties.TargetDateTableSheet);
+  var sheet = spreadSheet.getSheetByName(TargetDateTableSheet);
   var allLine = sheet.getRange("A2:A").getValues();
   for(var i = 0; i < allLine.length - 1; i++){
     var date = Moment.moment(allLine[i][0]).format("MM/DD");

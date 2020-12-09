@@ -123,38 +123,37 @@ function slackChatDelete(channel, ts) {
 //     "$slack_user_name": "$display_name
 //   }
 // }
-function saveOption(json) {
-  PropertiesService.getScriptProperties().setProperty("option", JSON.stringify(json));
+function saveOption(name, json) {
+  PropertiesService.getScriptProperties().setProperty(name, JSON.stringify(json));
 }
 
-function getOption() {
-  const rawJson = PropertiesService.getScriptProperties().getProperty("option");
+function getOption(name) {
+  const rawJson = PropertiesService.getScriptProperties().getProperty(name);
   var json = (rawJson == null)? {} : JSON.parse(rawJson);
-  if(!json.users) json.users = {};
   return json;
 }
 
-function editOption(action) {
-  const json = getOption();
+function editOption(name, action) {
+  const json = getOption(name);
   action(json);
-  saveOption(json);
+  saveOption(name, json);
 }
 
 function addUser(id, name) {
-  editOption((json) => {
-    json.users[id] = name;
+  editOption("users", (json) => {
+    json[id] = name;
   });
 }
 
 function removeUser(id) {
-  editOption((json) => {
+  editOption("users", (json) => {
     delete json.users[id];
   });
 }
 
 function getUser(id) {
-  const json = getOption();
-  if(json.users) return json.users[id];
+  const json = getOption("users");
+  if(json) return json[id];
   return null;
 }
 

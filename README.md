@@ -50,8 +50,21 @@
 2. 開いたURL `https://docs.google.com/spreadsheets/d/XXXXXXXXXX/` の `XXXXXXXXXX` の部分を切り取る
 3. 切り取ったIDを `ProgressReportSheet` としてプロパティに追加
 
-### 6. 実際に動かしてみる
+### 6. 実行テストをしてみる
 1. main.gs の内容を GAS プロジェクト の main.gs にコピペする
 2. `関数を選択` をクリックし `checkConnect` を選択
 3. 実行の許可が必要なので、許可する。
    安全ではないと言われたら `詳細` を押し、`安全ではないページ　に移動` を押す
+
+### 7. ウェブアプリを公開する
+1. `公開 > ウェブアプリケーションとして導入` を選択
+2. `Project version` を `New` に変更
+3. `Who has access to the app` を `Anyone, even anonymous` に変更
+4. `Deploy` で公開し、URLをコピー
+
+### 8. イベントを受け付ける
+1. `Features` から `Event Subscriptions` を選択
+2. `Enable Events` を `On` に変更
+3. `7.4` でコピーしたURLの末尾に `?path=event` を付加して、`Request URL` に貼り付ける
+4. `Subscribe to bot events` を選択
+5. `message.channels` を追加し、保存

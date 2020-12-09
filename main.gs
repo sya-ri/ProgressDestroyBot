@@ -4,11 +4,13 @@ var spreadSheet = SpreadsheetApp.openById(properties.ProgressReportSheet);
 var progressReportChannel = properties.ProgressReportChannel;
 
 function checkConnect(){
-  // 接続テスト https://api.slack.com/methods/auth.test
-  if(slackAuthTest().ok){
+  var response;
+  // 接続テスト
+  response = slackAuthTest();
+  if(response.ok){
     Logger.log("SlackAPIに接続しました")
   } else {
-    throw new Error("SlackAPIの接続に失敗しました");
+    throw new Error("SlackAPIの接続に失敗しました " + JSON.stringify(response));
   }
   /*
   if(!slackApp.channelsInfo(progressReportChannel).ok){
@@ -47,6 +49,7 @@ function slackFetch(path, param, option) {
   return JSON.parse(res.getContentText());
 }
 
+// https://api.slack.com/methods/auth.test
 function slackAuthTest() {
   return slackFetch("auth.test");
 }

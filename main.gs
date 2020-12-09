@@ -4,7 +4,9 @@ var spreadSheet = SpreadsheetApp.openById(properties.ProgressReportSheet);
 var progressReportChannel = properties.ProgressReportChannel;
 
 function checkConnect(){
-  if(!slackApp.authTest().ok){
+  Logger.log(slackAuthTest());
+  Logger.log(slackApp.authTest());
+  /*if(!slackAuthTest.ok){
     Logger.log("ボットの接続に失敗しました");
     return;
   }
@@ -12,8 +14,42 @@ function checkConnect(){
     Logger.log("進捗報告チャンネルが見つかりませんでした");
     return;
   }
-  Logger.log("接続に成功しました");
+  Logger.log("接続に成功しました");*/
 }
+
+/*** Slack API ***/
+var _uox = function(f, retry) {
+  if (retry == null) retry = 3;
+  var count = 0;
+  while (true) {
+    try {
+      return f();
+    } catch (e) {
+      if (retry < count) throw e;
+      Utilities.sleep(1000);
+      count++;
+    }
+  }
+};
+
+function slackFetch(path, param, option) {
+  if (param == null) param = {};
+  if (option == null) option = {};
+  param.token = properties.SlackApiToken;
+  var opt = {
+    method: "POST",
+    payload: param
+  };
+  var res = _uox(function() {
+    return UrlFetchApp.fetch("https://slack.com/api/" + path, opt);
+  });
+  return JSON.parse(res.getContentText());
+}
+
+function slackAuthTest() {
+  return slackFetch("auth.test");
+}
+/*** Slack API ***/
 
 function doPost(e) {
   var postData = JSON.parse(e.postData.getDataAsString());

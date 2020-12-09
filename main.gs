@@ -2,28 +2,23 @@ var properties = PropertiesService.getScriptProperties().getProperties();
 var slackApp = SlackApp.create(properties.SlackApiToken);
 var spreadSheet = SpreadsheetApp.openById(properties.ProgressReportSheet);
 
-function checkConnect(){
+function test(){
   var response;
   // 接続テスト
   response = slackAuthTest();
   if(response.ok){
-    Logger.log("SlackAPIに接続しました")
+    Logger.log("SlackAPIに接続しました");
   } else {
     throw new Error("SlackAPIの接続に失敗しました " + JSON.stringify(response));
   }
   // チャンネル参加
   response = slackChannelsJoin(properties.ProgressReportChannel);
   if(response.ok){
-    Logger.log("チャンネルに参加しました")
+    Logger.log("チャンネルに参加しました");
   } else {
     throw new Error("チャンネル参加に失敗しました " + JSON.stringify(response));
   }
-  /*
-  if(!slackApp.channelsInfo(progressReportChannel).ok){
-    Logger.log("進捗報告チャンネルが見つかりませんでした");
-    return;
-  }
-  Logger.log("接続に成功しました");*/
+  Logger.log("全てのテスト処理に成功");
 }
 
 /*** Slack API ***/

@@ -48,7 +48,7 @@
 
 ### 6. 実行テストをしてみる
 1. main.gs の内容を GAS プロジェクト の main.gs にコピペする
-2. `関数を選択` をクリックし `checkConnect` を選択
+2. `関数を選択` をクリックし `runTest` を選択
 3. 実行の許可が必要なので、許可する。
    安全ではないと言われたら `詳細` を押し、`安全ではないページ　に移動` を押す
 
@@ -56,7 +56,7 @@
 1. `公開 > ウェブアプリケーションとして導入` を選択
 2. `Project version` を `New` に変更
 3. `Who has access to the app` を `Anyone, even anonymous` に変更
-4. `Deploy` で公開し、URLをコピー(`7.1` で後からでもURLをコピーできる)
+4. `Deploy` で公開し、URLをコピー(`7.1` の手順で後からでもURLをコピーできる)
 
 ### 8. イベントを受け付ける
 1. `Features` から `Event Subscriptions` を選択
@@ -68,5 +68,5 @@
 ### 9. コマンドを追加する
 1. `Features` から `Slash Commands` を選択
 2. `Create New Command` を選択
-3. `7.4` でコピーしたURLの末尾に `path=cmd` を付加して、`Request URL` に貼り付ける
+3. `7.4` でコピーしたURLの末尾に `?path=cmd` を付加して、`Request URL` に貼り付ける
 4. `Short Description` を `進捗破壊ボット` に変更し、保存

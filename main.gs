@@ -169,6 +169,18 @@ function getUsers() {
   if(json) return json;
   return {};
 }
+
+const dayList = ["日", "月", "火", "水", "木", "金", "土"];
+
+function setDays(days) {
+  PropertiesService.getScriptProperties().setProperty("days", days.join(","));
+}
+
+function getDays() {
+  const rawArray = PropertiesService.getScriptProperties().getProperty("days");
+  if(rawArray) return rawArray.split(",").map(day => parseInt(day, 10));
+  return [];
+}
 /*** User Option ***/
 
 /*** doPost ***/
@@ -233,6 +245,52 @@ function doPostCmd(e) {
           return result.setContent(
             "*/nagao time date [Hour]*: 日付を送信する時間を設定します\n" +
             "*/nagao time destory [Hour]*: 進捗破壊する時間を設定します\n"
+          );
+      }
+    case "date":
+      switch ((arg[1])? arg[1].toLowerCase() : "") {
+        case "every":
+          const days = getDays();
+          switch ((arg[2])? arg[2].toLowerCase() : "") {
+            case "add":
+              if (arg.length != 4) return result.setContent("*/nagao date every add [0~6]*: 曜日を入力してください")
+              var dayNumber = Number(arg[3]);
+              if (dayNumber == NaN || dayNumber < 0 || 6 < dayNumber) return result.setContent("*/nagao date every add [0~6]*: 曜日が不正です");
+              if (days.includes(dayNumber)) return result.setContent("*/nagao date every add [0~6]*: 既に存在する曜日です");
+              days.push(dayNumber);
+              days.sort();
+              setDays(days);
+              return result.setContent("毎週報告する曜日に" + dayList[dayNumber] + "曜日を追加しました");
+            case "remove":
+              if (arg.length != 4) return result.setContent("*/nagao date every remove [0~6]*: 曜日を入力してください")
+              var dayNumber = Number(arg[3]);
+              if (dayNumber == NaN || dayNumber < 0 || 6 < dayNumber) return result.setContent("*/nagao date every remove [0~6]*: 曜日が不正です");
+              if (!days.includes(dayNumber)) return result.setContent("*/nagao date every add [0~6]*: 存在しない曜日です");
+              days.splice(days.indexOf(dayNumber), 1);
+              setDays(days);
+              return result.setContent("毎週報告する曜日から" + dayList[dayNumber] + "曜日を削除しました");
+            case "list":
+              var content = "*曜日一覧*\n";
+              days.forEach(day => { content += dayList[day] + ", " });
+              return result.setContent(content);
+            default:
+              return result.setContent(
+                "*/nagao date every add [0~6]*: 毎週報告する曜日を追加します。(日~土)\n" +
+                "*/nagao date every remove [0~6]*: 毎週報告する曜日を削除します。(日~土)\n" +
+                "*/nagao date every list*: 毎週報告する曜日の一覧を表示します\n"
+              );
+        }
+        case "other":
+          if (arg.length != 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
+          var hour = Number(arg[2]);
+          if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time destory [Hour]*: 時間が不正です")
+          ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDestory") ScriptApp.deleteTrigger(trigger); });
+          ScriptApp.newTrigger("postDestory").timeBased().everyHours(hour).create();
+          return result.setContent("進捗破壊の時間を " + hour + "時に設定しました");
+        default:
+          return result.setContent(
+            "*/nagao date every*: 毎週報告する曜日を設定します\n" +
+            "*/nagao date other*: 例外を定義します\n"
           );
       }
     default:

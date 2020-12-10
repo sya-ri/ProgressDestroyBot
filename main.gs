@@ -147,7 +147,7 @@ function addUser(id, name) {
 
 function removeUser(id) {
   editOption("users", (json) => {
-    delete json.users[id];
+    delete json[id];
   });
 }
 
@@ -158,8 +158,8 @@ function getUser(id) {
 }
 
 function getUsers() {
-  const json = getOption();
-  if(json.users) return json.users;
+  const json = getOption("users");
+  if(json) return json;
   return {};
 }
 /*** User Option ***/
@@ -174,7 +174,41 @@ function doPost(e) {
 }
 
 function doPostCmd(e) {
-  return ContentService.createTextOutput().setContent(JSON.stringify(e))
+  const result = ContentService.createTextOutput();
+  const arg = e.parameter["text"].split(RegExp("\\s+"));
+  if (arg[0] == e.parameter["command"]) arg.shift();
+  switch (arg[0].toLowerCase()) {
+    case "user":
+      switch ((arg[1])? arg[1].toLowerCase() : "") {
+        case "add":
+          if (arg.length != 4) return result.setContent("*/nagao user add [@User] [Name]*: ユーザーを追加します");
+          if (!(/<@.+|.+>/.test(arg[2]))) return result.setContent("ユーザーを指定してください");
+          var id = /<@([^|]+)|[^>]+>/.exec(arg[2])[1];
+          var name = arg[3];
+          addUser(id, name);
+          return result.setContent("<@" + id + "> を " + name + " として登録しました");
+        case "remove":
+          if (arg.length != 3) return result.setContent("*/nagao user remove [@User]*: ユーザーを削除します");
+          if (!(/<@.+|.+>/.test(arg[2]))) return result.setContent("ユーザーを指定してください");
+          var id = /<@([^|]+)|[^>]+>/.exec(arg[2])[1];
+          removeUser(id);
+          return result.setContent("<@" + id + "> を削除しました");
+        case "list":
+          var users = getUsers();
+          var content = "*ユーザー一覧*\n";
+          Object.keys(users).forEach(id => { content += "<@" + id + "> : " + users[id] + "\n" });
+          return result.setContent(content);
+        default:
+          return result.setContent(
+            "*/nagao user add [@User] [Name]*: ユーザーを追加します\n" +
+            "*/nagao user remove [@User]*: ユーザーを削除します\n" +
+            "*/nagao user list*: ユーザーの一覧を表示します\n"
+          );
+      }
+    default:
+      return result.setContent(JSON.stringify(e));
+  }
+
 }
 
 function doPostEvent(e) {

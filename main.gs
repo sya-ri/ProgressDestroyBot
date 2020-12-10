@@ -356,24 +356,25 @@ function doPostEvent(e) {
     if(postData.event.channel_type == "channel" && channel == getChannel()){
       const subtype = postData.event.subtype;
       var user_id;
-      var ts;
+      var thread_ts;
       var content;
       if(subtype == null || subtype == "file_share"){ // 追加
         user_id = postData.event.user;
-        ts = postData.event.thread_ts;
+        thread_ts = postData.event.thread_ts;
         content = postData.event.text;
       } else if(subtype == "message_changed"){ // 変更
         user_id = postData.event.message.user;
-        ts = postData.event.message.thread_ts;
+        thread_ts = postData.event.message.thread_ts;
+        if(thread_ts == postData.event.message.ts) return;
         content = postData.event.message.text;
-      } else if(subtype == "message_deleted"){
+      } else if(subtype == "message_deleted"){ // 削除
         user_id = postData.event.previous_message.user;
-        ts = postData.event.previous_message.thread_ts;
+        thread_ts = postData.event.previous_message.thread_ts;
         content = "";
       } else {
         return;
       }
-      editProgress(user_id, ts, content);
+      editProgress(user_id, thread_ts, content);
     }
   } 
 }

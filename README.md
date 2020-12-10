@@ -69,4 +69,5 @@
 1. `Features` から `Slash Commands` を選択
 2. `Create New Command` を選択
 3. `7.4` でコピーしたURLの末尾に `?path=cmd` を付加して、`Request URL` に貼り付ける
-4. `Short Description` を `進捗破壊ボット` に変更し、保存
+4. `Short Description` を `進捗破壊ボット` に変更
+5. `Escape channels, users, and links sent to your app` にチェックをつけて、保存

@@ -181,6 +181,16 @@ function getDays() {
   if(rawArray) return rawArray.split(",").map(day => parseInt(day, 10));
   return [];
 }
+
+function setDates(dates) {
+  PropertiesService.getScriptProperties().setProperty("dates", dates.join(","));
+}
+
+function getDates() {
+  const array = PropertiesService.getScriptProperties().getProperty("dates");
+  if(array) return array.split(",");
+  return [];
+}
 /*** User Option ***/
 
 /*** doPost ***/
@@ -280,17 +290,37 @@ function doPostCmd(e) {
                 "*/nagao date every list*: 毎週報告する曜日の一覧を表示します\n"
               );
         }
-        case "other":
-          if (arg.length != 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
-          var hour = Number(arg[2]);
-          if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time destory [Hour]*: 時間が不正です")
-          ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDestory") ScriptApp.deleteTrigger(trigger); });
-          ScriptApp.newTrigger("postDestory").timeBased().everyHours(hour).create();
-          return result.setContent("進捗破壊の時間を " + hour + "時に設定しました");
+        case "inverse":
+          const dates = getDates();
+          switch ((arg[2])? arg[2].toLowerCase() : "") {
+            case "add":
+              if (arg.length != 4) return result.setContent("*/nagao date inverse add [MM/dd]*: 日付を入力してください")
+              if (dates.includes(arg[3])) return result.setContent("*/nagao date inverse add [MM/dd]*: 既に存在する日付です");
+              dates.push(arg[3]);
+              dates.sort();
+              setDates(dates);
+              return result.setContent("報告の有無を反転する日付に" + arg[3] + "を追加しました");
+            case "remove":
+              if (arg.length != 4) return result.setContent("*/nagao date inverse remove [MM/dd]*: 日付を入力してください")
+              if (!dates.includes(arg[3])) return result.setContent("*/nagao date inverse remove [MM/dd]*: 存在しない日付です");
+              dates.splice(dates.indexOf(arg[3]), 1);
+              setDates(dates);
+              return result.setContent("報告の有無を反転する日付から" + arg[3] + "を削除しました");
+            case "list":
+              var content = "*反転する日付一覧*\n";
+              dates.forEach(date => { content += date + "\n" });
+              return result.setContent(content);
+            default:
+              return result.setContent(
+                "*/nagao date inverse add [MM/dd]*: 報告の有無を反転する日付を追加します\n" +
+                "*/nagao date inverse remove [MM/dd]*: 報告の有無を反転する日付を削除します\n" +
+                "*/nagao date inverse list*: 反転する日付の一覧を表示します\n"
+              );
+          }
         default:
           return result.setContent(
             "*/nagao date every*: 毎週報告する曜日を設定します\n" +
-            "*/nagao date other*: 例外を定義します\n"
+            "*/nagao date inverse*: 例外を定義します\n"
           );
       }
     default:

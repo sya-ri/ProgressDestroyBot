@@ -271,15 +271,10 @@ function postDate(){
 function postDestroy(){
   const today = Moment.moment().format("MM/DD");
   if(!isTargetDate(today)) return;
-  const sheet = spreadSheet.getSheetByName(UserIdTableSheet);
-  const allLine = sheet.getRange("A2:B").getValues();
-  const line = getSheetLineOfDate(today);
-  for(const i = 0; i < allLine.length; i++){
-    const userSheet = spreadSheet.getSheetByName(allLine[i][1]);
-    const value = userSheet.getRange("B" + line).getValue();
-    if(value != null && value != "") continue;
-    slackChatPostMessage(allLine[i][0], "お前、破壊されたいのか？？？");
-  }
+  const users = getUsers();
+  Object.keys(users).forEach((id) => {
+    slackChatPostMessage(id, "お前、破壊されたいのか？？？");
+  });
 }
 
 function editProgress(channel, user, ts, messageTs, content, editIfEmpty){

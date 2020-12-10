@@ -266,17 +266,16 @@ function doPostEvent(e) {
     }
   } 
 }
-      
+   
+const today = Utilities.formatDate(new Date(), "Asia/Tokyo", "MM/dd")
 
 function postDate(){
-  const today = Moment.moment().format("MM/DD");
   if(!isTargetDate(today)) return;
-  slackPostMessage(progressReportChannel, today);
+  slackChatPostMessage(ProgressReportChannel, today);
   deleteDestoryHistory();
 }
 
 function postDestroy(){
-  const today = Moment.moment().format("MM/DD");
   if(!isTargetDate(today)) return;
   const users = getUsers();
   Object.keys(users).forEach((id) => {
@@ -342,15 +341,7 @@ function getSheetLineOfDate(targetDate){
 }
 
 function isTargetDate(targetDate) {
-  const sheet = spreadSheet.getSheetByName(TargetDateTableSheet);
-  const allLine = sheet.getRange("A2:A").getValues();
-  for(const i = 0; i < allLine.length - 1; i++){
-    const date = Moment.moment(allLine[i][0]).format("MM/DD");
-    if(targetDate == date){
-      return true;
-    }
-  }
-  return false;
+  return true;
 }
 
 function deleteDestoryHistory() {

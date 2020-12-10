@@ -270,16 +270,14 @@ function doPostEvent(e) {
 /*** Date ***/
 const today = new Date();
 const todayDisplay = Utilities.formatDate(today, "Asia/Tokyo", "MM/dd");
-const todayIsDestoryDate = isDestoryDate(todayDisplay);
-
-function isDestoryDate(targetDate) {
+const todayIsDestoryDate = function(){
   return true;
-}
+}();
 /*** Date ***/
 
 function postDate(){
   if(!todayIsDestoryDate) return;
-  slackChatPostMessage(ProgressReportChannel, today);
+  slackChatPostMessage(ProgressReportChannel, todayDisplay);
   deleteDestoryHistory();
 }
 

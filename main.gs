@@ -4,8 +4,6 @@ const SlackApiToken = properties.SlackApiToken;
 const ProgressReportSheet = properties.ProgressReportSheet;
 /* プロジェクトプロパティ */
 
-const spreadSheet = SpreadsheetApp.openById(ProgressReportSheet);
-
 function runTest(){
   const channel = getChannel();
   var response;
@@ -357,22 +355,25 @@ function doPostEvent(e) {
     const channel = postData.event.channel;
     if(postData.event.channel_type == "channel" && channel == getChannel()){
       const subtype = postData.event.subtype;
+      var user_id;
+      var ts;
+      var content;
       if(subtype == null || subtype == "file_share"){ // 追加
-        const ts = postData.event.thread_ts;
-        if(ts != null){
-          editProgress(channel, postData.event.user, ts, postData.event.ts, postData.event.text, true);
-        }
+        user_id = postData.event.user;
+        ts = postData.event.thread_ts;
+        content = postData.event.text;
       } else if(subtype == "message_changed"){ // 変更
-        const ts = postData.event.message.thread_ts;
-        if(ts != null){
-          editProgress(channel, postData.event.message.user, ts, postData.event.message.ts, postData.event.message.text, false);
-        }
+        user_id = postData.event.message.user;
+        ts = postData.event.message.thread_ts;
+        content = postData.event.message.text;
       } else if(subtype == "message_deleted"){
-        const ts = postData.event.previous_message.thread_ts;
-        if(ts != null){
-          editProgress(channel, postData.event.previous_message.user, ts, postData.event.previous_message.ts, "", false);
-        }
+        user_id = postData.event.previous_message.user;
+        ts = postData.event.previous_message.thread_ts;
+        content = "";
+      } else {
+        return;
       }
+      editProgress(user_id, ts, content);
     }
   } 
 }
@@ -402,51 +403,59 @@ function postDestroy(){
 }
 /*** Post ***/
 
-function editProgress(channel, user, ts, messageTs, content, editIfEmpty){
-  const sheetName = getSheetName(user);
-  if(sheetName == null){
-    //slackPostMessage(channel, "シートが登録されてないです。開発者のお兄ちゃんに言ってね");
-    return;
-  }
-  const targetDate = Moment.moment(ts * 1000).subtract(9, 'h').format("MM/DD");
-  const isSuccess = setProgress(sheetName, targetDate, content, editIfEmpty);
-  if(isSuccess == null){
-    //slackPostMessage(channel, "なんかバグりました。開発者のお兄ちゃんに言ってね");
-    return;
-  }
-  if(!isSuccess){
-    slackChatDelete(channel, messageTs);
-  }
+/*** Progress ***/
+function editProgress(user_id, ts, content){
+  const date = Utilities.formatDate(new Date(ts * 1000), "Asia/Tokyo", "MM/dd");
+  const name = getUser(user_id);
+  setProgress(name, date, content);
 }
 
-function setProgress(user, date, content){
-  const line = getSheetLineOfDate(date);
-  if(line == null) return null;
-  const sheet = spreadSheet.getSheetByName(sheetName);
-  const range = sheet.getRange("B" + parseInt(line, "10"));
+function setProgress(name, date, content){
+  const row = getSheetRowOfDate(date);
+  const column = getSheetColumnOfDate(name);
+  const range = sheet.getRange(row, column);
   const value = range.getValue();
-  if(editIfEmpty && value != null && value != "") return false;
   range.setValue(content);
-  return true;
 }
+/*** Progress ***/
 
-function getSheetLineOfDate(date){
-  const sheet = spreadSheet.getSheets()[0];
-  const allLine = sheet.getRange("A2:A").getValues();
-  var i;
-  for(i = 0; i < allLine.length; i++){
-    if(allLine[i][0] == null || allLine[i][0] == "") {
-      spreadSheet.getRange("A" + parseInt(i + 2, "10")).setValue(date);
+/*** SpreadSheet ***/
+const sheet = SpreadsheetApp.openById(ProgressReportSheet).getSheets()[0];
+
+function getSheetColumnOfDate(name) {
+  const columns = sheet.getRange("1:1").getValues();
+  const columnsLength = columns.length;
+  for(var i = 1; i < columnsLength; i++){
+    if(columns[0][i] == null || columns[0][i] == "") {
+      sheet.getRange(1, i + 2).setValue(name);
       return i + 2;
     }
-    if(date == Utilities.formatDate(allLine[i][0], "Asia/Tokyo", "MM/dd")){
+    if(columns[0][i] == name){
       return i + 2;
     }
   }
-  spreadSheet.insertRowAfter(i + 1);
-  spreadSheet.getRange("A" + parseInt(i + 2, "10")).setValue(date);
-  return i + 2;
+  sheet.insertColumnAfter(columnsLength);
+  sheet.getRange(1, columnsLength + 1).setValue(name);
+  return columnsLength + 1;
 }
+
+function getSheetRowOfDate(date){
+  const rows = sheet.getRange("A2:A").getValues();
+  const rowsLength = rows.length;
+  for(var i = 0; i < rowsLength; i++){
+    if(rows[i][0] == null || rows[i][0] == "") {
+      sheet.getRange(i + 2, 1).setValue(date);
+      return i + 2;
+    }
+    if(date == Utilities.formatDate(rows[i][0], "Asia/Tokyo", "MM/dd")){
+      return i + 2;
+    }
+  }
+  sheet.insertRowAfter(rowsLength + 1);
+  sheet.getRange(rowsLength + 2, 1).setValue(date);
+  return rowsLength + 2;
+}
+/*** SpreadSheet ***/
 
 function deleteDestoryHistory() {
   const channels = slackChannelsList(1000).channels;

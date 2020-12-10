@@ -64,18 +64,25 @@
 3. `/nagao channel check` で確認
 
 ### 9. 日付投稿・進捗破壊の時間を設定する
-1. スラックで `/nagao time date [Hour]` で設定
+1. スラックで `/nagao time date [Hour]` で設定  
    例: `/nagao time date 8` ... ８時に投稿
-2. スラックで `/nagao time destory [Hour]` で設定
+2. スラックで `/nagao time destory [Hour]` で設定  
    例: `/nagao time date 20` ... 20時に破壊
 
 ### 10. 進捗報告する人を設定する
-1. スラックで `/nagao user add [@User] [Name]` で追加
+1. スラックで `/nagao user add [@User] [Name]` で追加  
    例: `/nagao user add @Slackの名前 表示名`
 2. `/nagao user remove [@User]` で削除可能
 3. `/nagao user list` で一覧を表示
 
-### 11. 実行テストをしてみる
+### 11. 進捗報告する日付を設定する
+1. 毎週、報告する曜日は `/nagao date every` で設定
+2. 日付単位で設定する場合は `/nagao date inverse` を使用  
+   `inverse` は反転という意味。  
+   `every` によって報告する予定となっていた日は報告しない日になる。  
+   報告しない予定となっていた日は報告する日になる。
+
+### 12. 実行テストをしてみる
 1. main.gs の内容を GAS プロジェクト の main.gs にコピペする
 2. `関数を選択` をクリックし `runTest` を選択
 3. 実行の許可が必要なので、許可する。

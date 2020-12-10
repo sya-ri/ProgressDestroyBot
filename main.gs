@@ -171,6 +171,7 @@ function getUsers() {
 }
 /*** User Option ***/
 
+/*** doPost ***/
 function doPost(e) {
   switch(e.parameter["path"]) {
     case "cmd":
@@ -266,6 +267,7 @@ function doPostEvent(e) {
     }
   } 
 }
+/*** doPost ***/
 
 /*** Date ***/
 const today = new Date();
@@ -275,6 +277,7 @@ const todayIsDestoryDate = function(){
 }();
 /*** Date ***/
 
+/*** Post ***/
 function postDate(){
   if(!todayIsDestoryDate) return;
   slackChatPostMessage(ProgressReportChannel, todayDisplay);
@@ -288,6 +291,7 @@ function postDestroy(){
     slackChatPostMessage(id, "お前、破壊されたいのか？？？");
   });
 }
+/*** Post ***/
 
 function editProgress(channel, user, ts, messageTs, content, editIfEmpty){
   const sheetName = getSheetName(user);

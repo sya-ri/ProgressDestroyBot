@@ -266,17 +266,25 @@ function doPostEvent(e) {
     }
   } 
 }
-   
-const today = Utilities.formatDate(new Date(), "Asia/Tokyo", "MM/dd")
+
+/*** Date ***/
+const today = new Date();
+const todayDisplay = Utilities.formatDate(today, "Asia/Tokyo", "MM/dd");
+const todayIsDestoryDate = isDestoryDate(todayDisplay);
+
+function isDestoryDate(targetDate) {
+  return true;
+}
+/*** Date ***/
 
 function postDate(){
-  if(!isTargetDate(today)) return;
+  if(!todayIsDestoryDate) return;
   slackChatPostMessage(ProgressReportChannel, today);
   deleteDestoryHistory();
 }
 
 function postDestroy(){
-  if(!isTargetDate(today)) return;
+  if(!todayIsDestoryDate) return;
   const users = getUsers();
   Object.keys(users).forEach((id) => {
     slackChatPostMessage(id, "お前、破壊されたいのか？？？");
@@ -338,10 +346,6 @@ function getSheetLineOfDate(targetDate){
     }
   }
   return null;
-}
-
-function isTargetDate(targetDate) {
-  return true;
 }
 
 function deleteDestoryHistory() {

@@ -99,6 +99,13 @@ function slackChannelsHistory(channel, limit) {
   });
 }
 
+// https://api.slack.com/methods/conversations.list
+function slackChannelsList(limit) {
+  return slackFetch("conversations.list", {
+    "limit": limit
+  });
+}
+
 // https://api.slack.com/methods/chat.postMessage
 function slackChatPostMessage(channel, text) {
   return slackFetch("chat.postMessage", {
@@ -347,17 +354,15 @@ function isTargetDate(targetDate) {
 }
 
 function deleteDestoryHistory() {
-  for(const i = 0; i < allLine.length; i++){
-    const userSheet = spreadSheet.getSheetByName(allLine[i][1]);
-    const value = userSheet.getRange("B" + line).getValue();
-    if(value != null && value != "") continue;
-    const im = allLine[i][0];
-    const imHistory = slackChannelsHistory(im.id, {count: 1000});
+  const channels = slackChannelsList(1000).channels;
+  Object.keys(channels).forEach(channel => {
+    if(!channel.is_im) return;
+    const imHistory = slackChannelsHistory(channel.id, 1000);
     const deleteSuccessCount = 0;
     const deleteFailureCount = 0;
-    imHistory.messages.forEach(function(message){
-      if(message.user != im.user && !message.hidden){
-        if(slackChatDelete(im.id, message.ts).ok){
+    imHistory.messages.forEach(message => {
+      if(!message.hidden){
+        if(slackChatDelete(message.channel, message.ts).ok){
           deleteSuccessCount ++;
         } else {
           deleteFailureCount ++;
@@ -367,5 +372,5 @@ function deleteDestoryHistory() {
     if(deleteSuccessCount != 0 || deleteFailureCount != 0){
       Logger.log(im.user + " 削除: " + deleteSuccessCount + " | " + deleteFailureCount);
     }
-  }
+  });
 }

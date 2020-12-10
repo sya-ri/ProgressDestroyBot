@@ -424,14 +424,14 @@ const sheet = SpreadsheetApp.openById(ProgressReportSheet).getSheets()[0];
 
 function getSheetColumnOfDate(name) {
   const columns = sheet.getRange("1:1").getValues();
-  const columnsLength = columns.length;
+  const columnsLength = columns[0].length;
   for(var i = 1; i < columnsLength; i++){
     if(columns[0][i] == null || columns[0][i] == "") {
       sheet.getRange(1, i + 2).setValue(name);
       return i + 2;
     }
     if(columns[0][i] == name){
-      return i + 2;
+      return i + 1;
     }
   }
   sheet.insertColumnAfter(columnsLength);

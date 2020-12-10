@@ -33,36 +33,35 @@
 7. ワークスペースにインストールする
 8. `Bot User OAuth Access Token` を `SlackApiToken` としてプロパティに追加
 
-### 4. 進捗報告するチャンネルを設定する
-1. スラックでチャンネルを作成する
-2. 作成したチャンネルを右クリックでリンクをコピー
-3. `https://~~~~~.slack.com/archives/XXXXXXXXXXX` というURLを取得できると思うので、 `XXXXXXXXXXX` の部分を切り取る
-4. 切り取ったチャンネルIDを　`ProgressReportChannel` としてプロパティに追加
-
-### 5. 進捗報告を管理するスプレッドシートを設定する
+### 4. 進捗報告を管理するスプレッドシートを設定する
 1. https://docs.google.com/spreadsheets で新規作成する
 2. 開いたURL `https://docs.google.com/spreadsheets/d/XXXXXXXXXX/` の `XXXXXXXXXX` の部分を切り取る
 3. 切り取ったIDを `ProgressReportSheet` としてプロパティに追加
 
-### 6. ウェブアプリを公開する
+### 5. ウェブアプリを公開する
 1. `公開 > ウェブアプリケーションとして導入` を選択
 2. `Project version` を `New` に変更
 3. `Who has access to the app` を `Anyone, even anonymous` に変更
 4. `Deploy` で公開し、URLをコピー(`7.1` の手順で後からでもURLをコピーできる)
 
-### 7. イベントを受け付ける
+### 6. イベントを受け付ける
 1. `Features` から `Event Subscriptions` を選択
 2. `Enable Events` を `On` に変更
 3. `7.4` でコピーしたURLの末尾に `?path=event` を付加して、`Request URL` に貼り付ける
 4. `Subscribe to bot events` を選択
 5. `message.channels` を追加し、保存
 
-### 8. コマンドを追加する
+### 7. コマンドを追加する
 1. `Features` から `Slash Commands` を選択
 2. `Create New Command` を選択
 3. `7.4` でコピーしたURLの末尾に `?path=cmd` を付加して、`Request URL` に貼り付ける
 4. `Short Description` を `進捗破壊ボット` に変更
 5. `Escape channels, users, and links sent to your app` にチェックをつけて、保存
+
+### 8. 進捗報告するチャンネルを設定する
+1. スラックでチャンネルを作成する
+2. 作成したチャンネルで `/nagao channel set` で設定
+3. `/nagao channel check` で確認
 
 ### 9. 実行テストをしてみる
 1. main.gs の内容を GAS プロジェクト の main.gs にコピペする

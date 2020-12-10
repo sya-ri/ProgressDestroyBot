@@ -2,14 +2,12 @@
 const properties = PropertiesService.getScriptProperties().getProperties();
 const SlackApiToken = properties.SlackApiToken;
 const ProgressReportSheet = properties.ProgressReportSheet;
-const UserIdTableSheet = properties.UserIdTableSheet;
-const TargetDateTableSheet = properties.TargetDateTableSheet;
-const ProgressReportChannel = properties.ProgressReportChannel;
 /* プロジェクトプロパティ */
 
 const spreadSheet = SpreadsheetApp.openById(ProgressReportSheet);
 
 function runTest(){
+  const channel = getChannel();
   var response;
   // 接続テスト
   response = slackAuthTest();
@@ -19,14 +17,14 @@ function runTest(){
     throw new Error("SlackAPIの接続に失敗しました " + JSON.stringify(response));
   }
   // チャンネル参加
-  response = slackChannelsJoin(ProgressReportChannel);
+  response = slackChannelsJoin(channel);
   if(response.ok){
     Logger.log("チャンネルに参加しました");
   } else {
     throw new Error("チャンネル参加に失敗しました " + JSON.stringify(response));
   }
   // メッセージ送信
-  response = slackChatPostMessage(ProgressReportChannel, "テストメッセージ");
+  response = slackChatPostMessage(channel, "テストメッセージ");
   if(response.ok){
     Logger.log("メッセージ送信に成功しました");
   } else {
@@ -34,14 +32,14 @@ function runTest(){
   }
   // メッセージ削除
   Utilities.sleep(5000); // 送信から５秒後に削除
-  response = slackChatDelete(ProgressReportChannel, response.message.ts);
+  response = slackChatDelete(channel, response.message.ts);
   if(response.ok){
     Logger.log("メッセージ削除に成功しました");
   } else {
     throw new Error("メッセージ削除に失敗しました " + JSON.stringify(response));
   }
   // メッセージ履歴取得
-  response = slackChannelsHistory(ProgressReportChannel, 1);
+  response = slackChannelsHistory(channel, 1);
   if(response.ok){
     Logger.log("メッセージ履歴取得に成功しました");
   } else {
@@ -191,6 +189,14 @@ function getDates() {
   if(array) return array.split(",");
   return [];
 }
+
+function setChannel(channel) {
+  PropertiesService.getScriptProperties().setProperty("slack_channel", channel); 
+}
+
+function getChannel() {
+  return PropertiesService.getScriptProperties().getProperty("slack_channel");
+}
 /*** User Option ***/
 
 /*** doPost ***/
@@ -208,6 +214,21 @@ function doPostCmd(e) {
   const arg = e.parameter["text"].split(RegExp("\\s+"));
   if (arg[0] == e.parameter["command"]) arg.shift();
   switch (arg[0].toLowerCase()) {
+    case "channel":
+      switch ((arg[1])? arg[1].toLowerCase() : "") {
+        case "set":
+          var channel = e.parameters.channel_id;
+          setChannel(String(channel));
+          return result.setContent("進捗報告のチャンネルを <#" + channel + "> に変更しました");
+        case "check":
+          var channel = getChannel();
+          return result.setContent("進捗報告のチャンネルは <#" + channel + "> です");
+        default:
+          return result.setContent(
+            "*/nagao channel set*: 進捗報告のチャンネルを設定します\n" +
+            "*/nagao channel check*: 進捗報告のチャンネルを確認します\n"
+          );
+      }
     case "user":
       switch ((arg[1])? arg[1].toLowerCase() : "") {
         case "add":
@@ -334,7 +355,7 @@ function doPostEvent(e) {
     return ContentService.createTextOutput(postData.challenge);
   } else if(postData.event.bot_profile == null){
     const channel = postData.event.channel;
-    if(postData.event.channel_type == "channel" && channel == progressReportChannel){
+    if(postData.event.channel_type == "channel" && channel == getChannel()){
       const subtype = postData.event.subtype;
       if(subtype == null || subtype == "file_share"){ // 追加
         const ts = postData.event.thread_ts;
@@ -368,7 +389,7 @@ const todayIsDestoryDate = function(){
 /*** Post ***/
 function postDate(){
   if(!todayIsDestoryDate) return;
-  slackChatPostMessage(ProgressReportChannel, todayDisplay);
+  slackChatPostMessage(getChannel(), todayDisplay);
   deleteDestoryHistory();
 }
 

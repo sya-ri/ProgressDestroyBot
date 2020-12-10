@@ -63,7 +63,11 @@
 2. 作成したチャンネルで `/nagao channel set` で設定
 3. `/nagao channel check` で確認
 
-### 9. 実行テストをしてみる
+### 9. 日付投稿の時間を設定する
+1. スラックで `/nagao time date [Hour]` で設定
+   例: `/nagao time date 8` ... ８時に投稿
+
+### 10. 実行テストをしてみる
 1. main.gs の内容を GAS プロジェクト の main.gs にコピペする
 2. `関数を選択` をクリックし `runTest` を選択
 3. 実行の許可が必要なので、許可する。

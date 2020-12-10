@@ -464,19 +464,6 @@ function deleteDestoryHistory() {
   Object.keys(channels).forEach(channel => {
     if(!channel.is_im) return;
     const imHistory = slackChannelsHistory(channel.id, 1000);
-    const deleteSuccessCount = 0;
-    const deleteFailureCount = 0;
-    imHistory.messages.forEach(message => {
-      if(!message.hidden){
-        if(slackChatDelete(message.channel, message.ts).ok){
-          deleteSuccessCount ++;
-        } else {
-          deleteFailureCount ++;
-        }
-      }
-    });
-    if(deleteSuccessCount != 0 || deleteFailureCount != 0){
-      Logger.log(im.user + " 削除: " + deleteSuccessCount + " | " + deleteFailureCount);
-    }
+    imHistory.messages.forEach(message => { if(!message.hidden) slackChatDelete(message.channel, message.ts) });
   });
 }

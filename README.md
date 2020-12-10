@@ -32,6 +32,7 @@
 > - channels:join
 > - chat:write
 > - commands
+> - im:history
 7. ワークスペースにインストールする
 8. `Bot User OAuth Access Token` を `SlackApiToken` としてプロパティに追加
 

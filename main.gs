@@ -419,19 +419,8 @@ function editProgress(channel, user, ts, messageTs, content, editIfEmpty){
   }
 }
 
-function getSheetName(user){
-  const sheet = spreadSheet.getSheetByName(UserIdTableSheet);
-  const allLine = sheet.getRange("A2:B").getValues();
-  for(const i = 0; i < allLine.length; i++){
-    if(user == allLine[i][0]){
-      return allLine[i][1];
-    }
-  }
-  return null;
-}
-
-function setProgress(sheetName, targetDate, content, editIfEmpty){
-  const line = getSheetLineOfDate(targetDate);
+function setProgress(user, date, content){
+  const line = getSheetLineOfDate(date);
   if(line == null) return null;
   const sheet = spreadSheet.getSheetByName(sheetName);
   const range = sheet.getRange("B" + parseInt(line, "10"));
@@ -441,22 +430,22 @@ function setProgress(sheetName, targetDate, content, editIfEmpty){
   return true;
 }
 
-const sheetLineCacheDate = null;
-const sheetLineOfDate = null;
-
-function getSheetLineOfDate(targetDate){
-  if(sheetLineCacheDate == targetDate && sheetLineOfDate != null) return sheetLineOfDate;
-  const sheet = spreadSheet.getSheetByName(TargetDateTableSheet);
+function getSheetLineOfDate(date){
+  const sheet = spreadSheet.getSheets()[0];
   const allLine = sheet.getRange("A2:A").getValues();
-  for(const i = 0; i < allLine.length - 1; i++){
-    const date = Moment.moment(allLine[i][0]).format("MM/DD");
-    if(targetDate == date){
-      sheetLineCacheDate = targetDate;
-      sheetLineOfDate = i + 2;
-      return sheetLineOfDate;
+  var i;
+  for(i = 0; i < allLine.length; i++){
+    if(allLine[i][0] == null || allLine[i][0] == "") {
+      spreadSheet.getRange("A" + parseInt(i + 2, "10")).setValue(date);
+      return i + 2;
+    }
+    if(date == Utilities.formatDate(allLine[i][0], "Asia/Tokyo", "MM/dd")){
+      return i + 2;
     }
   }
-  return null;
+  spreadSheet.insertRowAfter(i + 1);
+  spreadSheet.getRange("A" + parseInt(i + 2, "10")).setValue(date);
+  return i + 2;
 }
 
 function deleteDestoryHistory() {

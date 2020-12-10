@@ -7,8 +7,6 @@
 |ProgressReportSheet|スプレッドシート URL https://docs.google.com/spreadsheets/d/XXXXXXXXXX/ の XXXXXXXXXX|
 
 ## 導入する
-### 0. 導入する際はフォークしてください
-
 ### 1. GoogleAppsScript(GAS) のプロジェクトを作る
 1. https://script.google.com/ で `新しいプロジェクト` を押す
 2. `無題のプロジェクト` を押して、自分で好きなプロジェクト名を付ける

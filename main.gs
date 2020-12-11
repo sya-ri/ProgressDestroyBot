@@ -343,7 +343,12 @@ function doPostCmd(e) {
           );
       }
     default:
-      return result.setContent(JSON.stringify(e));
+      return result.setContent(
+        "*/nagao channel*: 進捗報告のチャンネルの設定をします\n" +
+        "*/nagao user*: 進捗報告する人の設定をします\n" +
+        "*/nagao time*: 定期メッセージに関する設定をします\n" +
+        "*/nagao date*: 進捗報告日の設定をします\n"
+      );
   }
 }
 

@@ -263,17 +263,17 @@ function doPostCmd(e) {
           ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDate") ScriptApp.deleteTrigger(trigger); });
           ScriptApp.newTrigger("postDate").timeBased().atHour(hour).everyDays(1).create();
           return result.setContent("日付送信の時間を " + hour + "時に設定しました");
-        case "destory":
+        case "destroy":
           if (arg.length != 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
           var hour = Number(arg[2]);
-          if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time destory [Hour]*: 時間が不正です")
-          ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDestory") ScriptApp.deleteTrigger(trigger); });
-          ScriptApp.newTrigger("postDestory").timeBased().atHour(hour).everyDays(1).create();
+          if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time destroy [Hour]*: 時間が不正です")
+          ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDestroy") ScriptApp.deleteTrigger(trigger); });
+          ScriptApp.newTrigger("postDestroy").timeBased().atHour(hour).everyDays(1).create();
           return result.setContent("進捗破壊の時間を " + hour + "時に設定しました");
         default:
           return result.setContent(
             "*/nagao time date [Hour]*: 日付を送信する時間を設定します\n" +
-            "*/nagao time destory [Hour]*: 進捗破壊する時間を設定します\n"
+            "*/nagao time destroy [Hour]*: 進捗破壊する時間を設定します\n"
           );
       }
     case "date":
@@ -383,20 +383,20 @@ function doPostEvent(e) {
 /*** Date ***/
 const today = new Date();
 const todayDisplay = Utilities.formatDate(today, "Asia/Tokyo", "MM/dd");
-const todayIsDestoryDate = function(){
+const todayIsDestroyDate = function(){
   return true;
 }();
 /*** Date ***/
 
 /*** Post ***/
 function postDate(){
-  if(!todayIsDestoryDate) return;
+  if(!todayIsDestroyDate) return;
   slackChatPostMessage(getChannel(), todayDisplay);
-  deleteDestoryHistory();
+  deleteDestroyHistory();
 }
 
 function postDestroy(){
-  if(!todayIsDestoryDate) return;
+  if(!todayIsDestroyDate) return;
   const users = getUsers();
   Object.keys(users).forEach((id) => {
     slackChatPostMessage(id, "お前、破壊されたいのか？？？");
@@ -458,7 +458,7 @@ function getSheetRowOfDate(date){
 }
 /*** SpreadSheet ***/
 
-function deleteDestoryHistory() {
+function deleteDestroyHistory() {
   const channels = slackChannelsList(1000).channels;
   Object.keys(channels).forEach(channel => {
     if(!channel.is_im) return;

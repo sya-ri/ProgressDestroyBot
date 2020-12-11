@@ -6,7 +6,7 @@ const ProgressReportSheet = properties.ProgressReportSheet;
 
 function runTest(){
     const channel = getChannel();
-    var response;
+    let response;
     // 接続テスト
     response = slackAuthTest();
     if(response.ok){
@@ -49,7 +49,7 @@ function runTest(){
 /*** Slack API ***/
 const _uox = function(f, retry) {
     if (retry == null) retry = 3;
-    const count = 0;
+    let count = 0;
     while (true) {
         try {
             return f();
@@ -61,9 +61,8 @@ const _uox = function(f, retry) {
     }
 };
 
-function slackFetch(path, param, option) {
+function slackFetch(path, param) {
     if (param == null) param = {};
-    if (option == null) option = {};
     param.token = SlackApiToken;
     const opt = {
         method: "POST",
@@ -120,20 +119,13 @@ function slackChatDelete(channel, ts) {
 /*** Slack API ***/
 
 /*** User Option ***/
-// --- option: JSON
-// {
-//     "users": {
-//         "$slack_user_name": "$display_name
-//     }
-// }
 function saveOption(name, json) {
     PropertiesService.getScriptProperties().setProperty(name, JSON.stringify(json));
 }
 
 function getOption(name) {
     const rawJson = PropertiesService.getScriptProperties().getProperty(name);
-    var json = (rawJson == null)? {} : JSON.parse(rawJson);
-    return json;
+    return (rawJson == null) ? {} : JSON.parse(rawJson);
 }
 
 function editOption(name, action) {
@@ -210,13 +202,13 @@ function doPost(e) {
 function doPostCmd(e) {
     const result = ContentService.createTextOutput();
     const arg = e.parameter["text"].split(RegExp("\\s+"));
-    if (arg[0] == e.parameter["command"]) arg.shift();
+    if (arg[0] === e.parameter["command"]) arg.shift();
     switch (arg[0].toLowerCase()) {
         case "channel":
             switch ((arg[1])? arg[1].toLowerCase() : "") {
                 case "set":
-                    var channel = e.parameters.channel_id;
-                    setChannel(String(channel));
+                    var channel = e.parameter.channel_id;
+                    setChannel(channel);
                     return result.setContent("進捗報告のチャンネルを <#" + channel + "> に変更しました");
                 case "check":
                     var channel = getChannel();
@@ -230,14 +222,14 @@ function doPostCmd(e) {
         case "user":
             switch ((arg[1])? arg[1].toLowerCase() : "") {
                 case "add":
-                    if (arg.length != 4) return result.setContent("*/nagao user add [@User] [Name]*: ユーザーを追加します");
+                    if (arg.length !== 4) return result.setContent("*/nagao user add [@User] [Name]*: ユーザーを追加します");
                     if (!(/<@.+|.+>/.test(arg[2]))) return result.setContent("ユーザーを指定してください");
                     var id = /<@([^|]+)|[^>]+>/.exec(arg[2])[1];
                     var name = arg[3];
                     addUser(id, name);
                     return result.setContent("<@" + id + "> を " + name + " として登録しました");
                 case "remove":
-                    if (arg.length != 3) return result.setContent("*/nagao user remove [@User]*: ユーザーを削除します");
+                    if (arg.length !== 3) return result.setContent("*/nagao user remove [@User]*: ユーザーを削除します");
                     if (!(/<@.+|.+>/.test(arg[2]))) return result.setContent("ユーザーを指定してください");
                     var id = /<@([^|]+)|[^>]+>/.exec(arg[2])[1];
                     removeUser(id);
@@ -257,16 +249,16 @@ function doPostCmd(e) {
         case "time":
             switch ((arg[1])? arg[1].toLowerCase() : "") {
                 case "date":
-                    if (arg.length != 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
+                    if (arg.length !== 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
                     var hour = Number(arg[2]);
-                    if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time date [Hour]*: 時間が不正です")
+                    if (isNaN(hour) || hour < 0 || 24 < hour) return result.setContent("*/nagao time date [Hour]*: 時間が不正です")
                     ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDate") ScriptApp.deleteTrigger(trigger); });
                     ScriptApp.newTrigger("postDate").timeBased().atHour(hour).everyDays(1).create();
                     return result.setContent("日付送信の時間を " + hour + "時に設定しました");
                 case "destroy":
-                    if (arg.length != 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
+                    if (arg.length !== 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
                     var hour = Number(arg[2]);
-                    if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time destroy [Hour]*: 時間が不正です")
+                    if (isNaN(hour) || hour < 0 || 24 < hour) return result.setContent("*/nagao time destroy [Hour]*: 時間が不正です")
                     ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDestroy") ScriptApp.deleteTrigger(trigger); });
                     ScriptApp.newTrigger("postDestroy").timeBased().atHour(hour).everyDays(1).create();
                     return result.setContent("進捗破壊の時間を " + hour + "時に設定しました");
@@ -282,18 +274,18 @@ function doPostCmd(e) {
                     const days = getDays();
                     switch ((arg[2])? arg[2].toLowerCase() : "") {
                         case "add":
-                            if (arg.length != 4) return result.setContent("*/nagao date every add [0~6]*: 曜日を入力してください")
+                            if (arg.length !== 4) return result.setContent("*/nagao date every add [0~6]*: 曜日を入力してください")
                             var dayNumber = Number(arg[3]);
-                            if (dayNumber == NaN || dayNumber < 0 || 6 < dayNumber) return result.setContent("*/nagao date every add [0~6]*: 曜日が不正です");
+                            if (isNaN(dayNumber) || dayNumber < 0 || 6 < dayNumber) return result.setContent("*/nagao date every add [0~6]*: 曜日が不正です");
                             if (days.includes(dayNumber)) return result.setContent("*/nagao date every add [0~6]*: 既に存在する曜日です");
                             days.push(dayNumber);
                             days.sort();
                             setDays(days);
                             return result.setContent("毎週報告する曜日に" + dayList[dayNumber] + "曜日を追加しました");
                         case "remove":
-                            if (arg.length != 4) return result.setContent("*/nagao date every remove [0~6]*: 曜日を入力してください")
+                            if (arg.length !== 4) return result.setContent("*/nagao date every remove [0~6]*: 曜日を入力してください")
                             var dayNumber = Number(arg[3]);
-                            if (dayNumber == NaN || dayNumber < 0 || 6 < dayNumber) return result.setContent("*/nagao date every remove [0~6]*: 曜日が不正です");
+                            if (isNaN(dayNumber) || dayNumber < 0 || 6 < dayNumber) return result.setContent("*/nagao date every remove [0~6]*: 曜日が不正です");
                             if (!days.includes(dayNumber)) return result.setContent("*/nagao date every add [0~6]*: 存在しない曜日です");
                             days.splice(days.indexOf(dayNumber), 1);
                             setDays(days);
@@ -313,14 +305,14 @@ function doPostCmd(e) {
                     const dates = getDates();
                     switch ((arg[2])? arg[2].toLowerCase() : "") {
                         case "add":
-                            if (arg.length != 4) return result.setContent("*/nagao date inverse add [MM/dd]*: 日付を入力してください")
+                            if (arg.length !== 4) return result.setContent("*/nagao date inverse add [MM/dd]*: 日付を入力してください")
                             if (dates.includes(arg[3])) return result.setContent("*/nagao date inverse add [MM/dd]*: 既に存在する日付です");
                             dates.push(arg[3]);
                             dates.sort();
                             setDates(dates);
                             return result.setContent("報告の有無を反転する日付に" + arg[3] + "を追加しました");
                         case "remove":
-                            if (arg.length != 4) return result.setContent("*/nagao date inverse remove [MM/dd]*: 日付を入力してください")
+                            if (arg.length !== 4) return result.setContent("*/nagao date inverse remove [MM/dd]*: 日付を入力してください")
                             if (!dates.includes(arg[3])) return result.setContent("*/nagao date inverse remove [MM/dd]*: 存在しない日付です");
                             dates.splice(dates.indexOf(arg[3]), 1);
                             setDates(dates);
@@ -354,25 +346,25 @@ function doPostCmd(e) {
 
 function doPostEvent(e) {
     const postData = JSON.parse(e.postData.getDataAsString());
-    if(postData.type == "url_verification") {
+    if(postData.type === "url_verification") {
         return ContentService.createTextOutput(postData.challenge);
     } else if(postData.event.bot_profile == null){
         const channel = postData.event.channel;
-        if(postData.event.channel_type == "channel" && channel == getChannel()){
+        if(postData.event.channel_type === "channel" && channel === getChannel()){
             const subtype = postData.event.subtype;
-            var user_id;
-            var thread_ts;
-            var content;
-            if(subtype == null || subtype == "file_share"){ // 追加
+            let user_id;
+            let thread_ts;
+            let content;
+            if(subtype == null || subtype === "file_share"){ // 追加
                 user_id = postData.event.user;
                 thread_ts = postData.event.thread_ts;
                 content = postData.event.text;
-            } else if(subtype == "message_changed"){ // 変更
+            } else if(subtype === "message_changed"){ // 変更
                 user_id = postData.event.message.user;
                 thread_ts = postData.event.message.thread_ts;
-                if(thread_ts == postData.event.message.ts) return;
+                if(thread_ts === postData.event.message.ts) return;
                 content = postData.event.message.text;
-            } else if(subtype == "message_deleted"){ // 削除
+            } else if(subtype === "message_deleted"){ // 削除
                 user_id = postData.event.previous_message.user;
                 thread_ts = postData.event.previous_message.thread_ts;
                 content = "";
@@ -420,7 +412,6 @@ function setProgress(name, date, content){
     const row = getSheetRowOfDate(date);
     const column = getSheetColumnOfDate(name);
     const range = sheet.getRange(row, column);
-    const value = range.getValue();
     range.setValue(content);
 }
 /*** Progress ***/
@@ -431,12 +422,12 @@ const sheet = SpreadsheetApp.openById(ProgressReportSheet).getSheets()[0];
 function getSheetColumnOfDate(name) {
     const columns = sheet.getRange("1:1").getValues();
     const columnsLength = columns[0].length;
-    for(var i = 1; i < columnsLength; i++){
-        if(columns[0][i] == null || columns[0][i] == "") {
+    for(let i = 1; i < columnsLength; i++){
+        if(columns[0][i] == null || columns[0][i] === "") {
             sheet.getRange(1, i + 2).setValue(name);
             return i + 2;
         }
-        if(columns[0][i] == name){
+        if(columns[0][i] === name){
             return i + 1;
         }
     }
@@ -449,11 +440,11 @@ function getSheetRowOfDate(date){
     const rows = sheet.getRange("A2:A").getValues();
     const rowsLength = rows.length;
     for(var i = 0; i < rowsLength; i++){
-        if(rows[i][0] == null || rows[i][0] == "") {
+        if(rows[i][0] == null || rows[i][0] === "") {
             sheet.getRange(i + 2, 1).setValue(date);
             return i + 2;
         }
-        if(date == Utilities.formatDate(rows[i][0], "Asia/Tokyo", "MM/dd")){
+        if(date === Utilities.formatDate(rows[i][0], "Asia/Tokyo", "MM/dd")){
             return i + 2;
         }
     }

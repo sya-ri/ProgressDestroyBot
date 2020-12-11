@@ -261,14 +261,14 @@ function doPostCmd(e) {
           var hour = Number(arg[2]);
           if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time date [Hour]*: 時間が不正です")
           ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDate") ScriptApp.deleteTrigger(trigger); });
-          ScriptApp.newTrigger("postDate").timeBased().everyHours(hour).create();
+          ScriptApp.newTrigger("postDate").timeBased().atHour(hour).everyDays(1).create();
           return result.setContent("日付送信の時間を " + hour + "時に設定しました");
         case "destory":
           if (arg.length != 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
           var hour = Number(arg[2]);
           if (hour == NaN || hour < 0 || 24 < hour) return result.setContent("*/nagao time destory [Hour]*: 時間が不正です")
           ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDestory") ScriptApp.deleteTrigger(trigger); });
-          ScriptApp.newTrigger("postDestory").timeBased().everyHours(hour).create();
+          ScriptApp.newTrigger("postDestory").timeBased().atHour(hour).everyDays(1).create();
           return result.setContent("進捗破壊の時間を " + hour + "時に設定しました");
         default:
           return result.setContent(

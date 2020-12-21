@@ -249,23 +249,23 @@ function doPostCmd(e) {
         case "time":
             switch ((arg[1])? arg[1].toLowerCase() : "") {
                 case "date":
-                    if (arg.length !== 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
+                    if (arg.length !== 3) return result.setContent("*/nagao time date [Hour]*: 時刻も入力してください")
                     var hour = Number(arg[2]);
-                    if (isNaN(hour) || hour < 0 || 24 < hour) return result.setContent("*/nagao time date [Hour]*: 時間が不正です")
+                    if (isNaN(hour) || hour < 0 || 24 < hour) return result.setContent("*/nagao time date [Hour]*: 時刻が不正です")
                     ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDate") ScriptApp.deleteTrigger(trigger); });
                     ScriptApp.newTrigger("postDate").timeBased().atHour(hour).everyDays(1).create();
-                    return result.setContent("日付送信の時間を " + hour + "時に設定しました");
+                    return result.setContent("日付送信の時刻を " + hour + "時に設定しました");
                 case "destroy":
-                    if (arg.length !== 3) return result.setContent("*/nagao time date [Hour]*: 時間も入力してください")
+                    if (arg.length !== 3) return result.setContent("*/nagao time date [Hour]*: 時刻も入力してください")
                     var hour = Number(arg[2]);
-                    if (isNaN(hour) || hour < 0 || 24 < hour) return result.setContent("*/nagao time destroy [Hour]*: 時間が不正です")
+                    if (isNaN(hour) || hour < 0 || 24 < hour) return result.setContent("*/nagao time destroy [Hour]*: 時刻が不正です")
                     ScriptApp.getProjectTriggers().forEach((trigger) => { if(trigger.getHandlerFunction() == "postDestroy") ScriptApp.deleteTrigger(trigger); });
                     ScriptApp.newTrigger("postDestroy").timeBased().atHour(hour).everyDays(1).create();
-                    return result.setContent("進捗破壊の時間を " + hour + "時に設定しました");
+                    return result.setContent("進捗破壊の時刻を " + hour + "時に設定しました");
                 default:
                     return result.setContent(
-                        "*/nagao time date [Hour]*: 日付を送信する時間を設定します\n" +
-                        "*/nagao time destroy [Hour]*: 進捗破壊する時間を設定します\n"
+                        "*/nagao time date [Hour]*: 日付を送信する時刻を設定します\n" +
+                        "*/nagao time destroy [Hour]*: 進捗破壊する時刻を設定します\n"
                     );
             }
         case "date":

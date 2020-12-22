@@ -381,7 +381,9 @@ function doPostEvent(e) {
 const today = new Date();
 const todayDisplay = Utilities.formatDate(today, "Asia/Tokyo", "MM/dd");
 const todayIsDestroyDate = function(){
-    return true;
+    const isTargetDay = today.getDay() in getDays();
+    if(todayDisplay in getDates()) return !isTargetDay;
+    return isTargetDay;
 }();
 /*** Date ***/
 

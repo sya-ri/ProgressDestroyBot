@@ -397,8 +397,12 @@ function postDate(){
 function postDestroy(){
     if(!todayIsDestroyDate) return;
     const users = getUsers();
+    const row = getSheetRowOfDate(date);
     Object.keys(users).forEach((id) => {
-        slackChatPostMessage(id, "お前、破壊されたいのか？？？");
+        const column = getSheetColumnOfName(users[id]);
+        const range = sheet.getRange(row, column);
+        const value = range.getValue();
+        if(value == null || value == "") slackChatPostMessage(id, "お前、破壊されたいのか？？？");
     });
 }
 /*** Post ***/
@@ -412,7 +416,7 @@ function editProgress(user_id, ts, content){
 
 function setProgress(name, date, content){
     const row = getSheetRowOfDate(date);
-    const column = getSheetColumnOfDate(name);
+    const column = getSheetColumnOfName(name);
     const range = sheet.getRange(row, column);
     range.setValue(content);
 }
@@ -421,7 +425,7 @@ function setProgress(name, date, content){
 /*** SpreadSheet ***/
 const sheet = SpreadsheetApp.openById(ProgressReportSheet).getSheets()[0];
 
-function getSheetColumnOfDate(name) {
+function getSheetColumnOfName(name) {
     const columns = sheet.getRange("1:1").getValues();
     const columnsLength = columns[0].length;
     for(let i = 1; i < columnsLength; i++){

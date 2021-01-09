@@ -397,7 +397,7 @@ function postDate(){
 function postDestroy(){
     if(!todayIsDestroyDate) return;
     const users = getUsers();
-    const row = getSheetRowOfDate(date);
+    const row = getSheetRowOfDate(today);
     Object.keys(users).forEach((id) => {
         const column = getSheetColumnOfName(users[id]);
         const range = sheet.getRange(row, column);

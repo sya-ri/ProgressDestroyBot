@@ -397,7 +397,7 @@ function postDate(){
 function postDestroy(){
     if(!todayIsDestroyDate) return;
     const users = getUsers();
-    const row = getSheetRowOfDate(today);
+    const row = getSheetRowOfDate(todayDisplay);
     Object.keys(users).forEach((id) => {
         const column = getSheetColumnOfName(users[id]);
         const range = sheet.getRange(row, column);
@@ -426,12 +426,12 @@ function setProgress(name, date, content){
 const sheet = SpreadsheetApp.openById(ProgressReportSheet).getSheets()[0];
 
 function getSheetColumnOfName(name) {
-    const columns = sheet.getRange("1:1").getValues();
+    const columns = sheet.getRange("A1:1").getValues();
     const columnsLength = columns[0].length;
     for(let i = 1; i < columnsLength; i++){
         if(columns[0][i] == null || columns[0][i] === "") {
-            sheet.getRange(1, i + 2).setValue(name);
-            return i + 2;
+            sheet.getRange(1, i + 1).setValue(name);
+            return i + 1;
         }
         if(columns[0][i] === name){
             return i + 1;
@@ -450,7 +450,7 @@ function getSheetRowOfDate(date){
             sheet.getRange(i + 2, 1).setValue(date);
             return i + 2;
         }
-        if(date === Utilities.formatDate(rows[i][0], "Asia/Tokyo", "MM/dd")){
+        if(date === Utilities.formatDate(new Date(rows[i][0]), "Asia/Tokyo", "MM/dd")){
             return i + 2;
         }
     }
